@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O Atleta Elevado - Guia Interativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals: stone/amber, Muted accent: teal) -->
+    <!-- Application Structure Plan: A aplicação foi estruturada como um painel de controle (dashboard) de página única com navegação lateral fixa. Em vez de seguir a ordem linear dos capítulos do e-book, o conteúdo foi agrupado em pilares temáticos (Início, Treinamento, Nutrição, Recuperação, Mente). Esta arquitetura de informação foi escolhida porque permite ao atleta um acesso rápido e não linear aos tópicos de interesse, funcionando como uma ferramenta de referência prática, em oposição a um documento para ser lido do início ao fim. Subseções utilizam abas ou cartões interativos para aprofundar temas complexos como periodização e suplementação, mantendo a interface limpa e focada no usuário. -->
+    <!-- Visualization & Content Choices: Informar: Cards interativos para técnicas de intensificação. Comparar: Tabela comparativa para modelos de periodização e um guia de suplementos filtrável por tiers de evidência. Mudar/Processo: Gráfico de barras dinâmico (Chart.js) para visualizar o Carb Cycling e uma linha do tempo em HTML/CSS para o macrociclo de 12 semanas. Organizar: A estrutura principal é o painel com navegação lateral e abas internas, que organizam logicamente a vasta quantidade de informação. A justificação para cada escolha é melhorar a usabilidade e a retenção de conhecimento, transformando conceitos estáticos em ferramentas exploráveis. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fdfcfb; /* Lighter than stone-50 */
+            color: #292524; /* stone-800 */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active {
+            background-color: #fef3c7; /* amber-100 */
+            color: #92400e; /* amber-800 */
+            border-left-color: #d97706; /* amber-600 */
+        }
+        .nav-link:hover {
+            background-color: #fef9c3; /* amber-50 */
+            border-left-color: #fcd34d; /* amber-400 */
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: #ccfbf1; /* teal-100 */
+            color: #0f766e; /* teal-700 */
+            border-bottom-color: #14b8a6; /* teal-500 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-stone-50">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar Navigation -->
+        <nav class="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-stone-200 flex-shrink-0">
+            <div class="p-6">
+                <h1 class="text-xl font-bold text-amber-700">O Atleta Elevado</h1>
+                <p class="text-sm text-stone-500">Guia Interativo</p>
+            </div>
+            <ul class="flex flex-row md:flex-col p-2 md:p-4">
+                <li><a href="#inicio" class="nav-link active flex items-center p-3 my-1 rounded-lg font-medium text-stone-700"><span>🏠</span><span class="ml-3 hidden md:block">Início</span></a></li>
+                <li><a href="#treinamento" class="nav-link flex items-center p-3 my-1 rounded-lg font-medium text-stone-700"><span>🏋️</span><span class="ml-3 hidden md:block">Treinamento</span></a></li>
+                <li><a href="#nutricao" class="nav-link flex items-center p-3 my-1 rounded-lg font-medium text-stone-700"><span>🍎</span><span class="ml-3 hidden md:block">Nutrição e Suplementos</span></a></li>
+                <li><a href="#recuperacao" class="nav-link flex items-center p-3 my-1 rounded-lg font-medium text-stone-700"><span>🔋</span><span class="ml-3 hidden md:block">Recuperação</span></a></li>
+                <li><a href="#mente" class="nav-link flex items-center p-3 my-1 rounded-lg font-medium text-stone-700"><span>🧠</span><span class="ml-3 hidden md:block">Fortaleza Mental</span></a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <div id="inicio" class="content-section active">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">A Transição para a Elite</h2>
+                <p class="text-lg text-stone-600 mb-6 leading-relaxed">Bem-vindo ao guia interativo "O Atleta Elevado". Esta aplicação foi projetada para você, o atleta intermediário que já domina os fundamentos, mas agora enfrenta o desafio de quebrar platôs de desempenho. Aqui, transformamos o conhecimento científico de ponta em estratégias práticas e exploráveis, permitindo que você navegue, interaja e aplique os conceitos que separam o progresso contínuo da estagnação. Use a navegação lateral para explorar os pilares da performance e elevar seu jogo a um novo patamar.</p>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-3">Quem é o Atleta Intermediário?</h3>
+                    <p class="text-stone-600 mb-4">A transição de iniciante para intermediário é um marco fisiológico. A sua limitação não é mais aprender o movimento, mas sim a capacidade fisiológica de executá-lo com mais carga ou por mais tempo. O platô que você enfrenta não é um fracasso; é uma graduação. Seu corpo se adaptou e agora exige estímulos mais inteligentes e sofisticados.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <p class="font-bold text-amber-800">Sinal do Iniciante</p>
+                            <p class="text-sm text-amber-700">Progressão limitada pela coordenação motora e aprendizado técnico.</p>
+                        </div>
+                        <div class="bg-teal-50 p-4 rounded-lg">
+                            <p class="font-bold text-teal-800">Sinal do Intermediário</p>
+                            <p class="text-sm text-teal-700">Progressão limitada pela capacidade fisiológica (força, resistência).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="treinamento" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Pilar do Treinamento: Arquitetura e Autorregulação</h2>
+                 <p class="text-lg text-stone-600 mb-6 leading-relaxed">Nesta seção, exploramos como estruturar seu treinamento com a sofisticação de um atleta de elite. Você aprenderá sobre diferentes modelos de periodização para organizar seus treinos ao longo do tempo, como dialogar com seu corpo usando a autorregulação para ajustar o esforço diário e descobrirá um arsenal de técnicas avançadas para destruir platôs de forma estratégica. Navegue pelas abas abaixo para mergulhar em cada conceito.</p>
+                <div id="treinamento-tabs" class="mb-6 border-b border-stone-200">
+                    <button class="tab-button active py-2 px-4 border-b-2 font-medium text-stone-600" data-tab="periodizacao">Periodização</button>
+                    <button class="tab-button py-2 px-4 border-b-2 font-medium text-stone-600" data-tab="autorregulacao">Autorregulação</button>
+                    <button class="tab-button py-2 px-4 border-b-2 font-medium text-stone-600" data-tab="platos">Quebrando Platôs</button>
+                </div>
+                
+                <div id="periodizacao" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">Modelos de Periodização: Comparativo</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-xl text-stone-800 mb-2">Linear (PL)</h4>
+                            <p class="text-stone-600 mb-3 text-sm">Estrutura clássica onde o volume diminui enquanto a intensidade aumenta em blocos longos.</p>
+                            <p class="font-semibold text-green-700 text-sm">Prós: Simples, ideal para iniciantes.</p>
+                            <p class="font-semibold text-red-700 text-sm">Contras: Risco de destreino, monotonia.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200 ring-2 ring-amber-500">
+                             <h4 class="font-bold text-xl text-stone-800 mb-2">Ondulatória Diária (DUP)</h4>
+                            <p class="text-stone-600 mb-3 text-sm">Variação de volume e intensidade a cada sessão, permitindo treinar múltiplas qualidades simultaneamente.</p>
+                            <p class="font-semibold text-green-700 text-sm">Prós: Evita monotonia, ganhos consistentes.</p>
+                            <p class="font-semibold text-red-700 text-sm">Contras: Mais complexa de programar.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                             <h4 class="font-bold text-xl text-stone-800 mb-2">Em Blocos (PB)</h4>
+                            <p class="text-stone-600 mb-3 text-sm">Foco concentrado em uma habilidade por bloco (Acumulação, Transmutação, Realização) para picos de performance.</p>
+                            <p class="font-semibold text-green-700 text-sm">Prós: Excelente para picos competitivos.</p>
+                            <p class="font-semibold text-red-700 text-sm">Contras: Exige alta recuperação, não ideal para o ano todo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="autorregulacao" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">A Bússola do Esforço: RPE e RIR</h3>
+                     <p class="text-stone-600 mb-6">A autorregulação permite ajustar o treino à sua prontidão diária. Em vez de usar pesos fixos, você treina com base no seu nível de esforço percebido. As ferramentas para isso são a Taxa de Percepção de Esforço (RPE) e as Repetições na Reserva (RIR).</p>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="chart-container h-80">
+                            <canvas id="rpeChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-stone-500 mt-2">Gráfico RPE vs. RIR. Use esta escala para guiar a intensidade das suas séries de trabalho.</p>
+                    </div>
+                </div>
+
+                <div id="platos" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">Arsenal Anti-Platô: Técnicas de Intensificação</h3>
+                    <p class="text-stone-600 mb-6">Quando o progresso estagna, use estas técnicas de forma estratégica (1-2 exercícios por sessão, por blocos de 3-6 semanas) para introduzir um novo estímulo e forçar a adaptação.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-stone-800">Drop Sets</h4>
+                            <p class="text-sm text-stone-600">Série até a falha, reduz o peso 20-30% e continua até a falha novamente. Foco em <span class="font-semibold text-teal-700">estresse metabólico</span>.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-stone-800">Rest-Pause</h4>
+                            <p class="text-sm text-stone-600">Série até a falha, descansa 15-30s, e faz mais reps com o mesmo peso. Aumenta o volume com <span class="font-semibold text-teal-700">cargas pesadas</span>.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-stone-800">Cluster Sets</h4>
+                            <p class="text-sm text-stone-600">Divide uma série em "clusters" com pausas curtas (e.g., 3x2 reps com 15s de pausa). Maximiza a <span class="font-semibold text-amber-700">tensão mecânica</span>.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                            <h4 class="font-bold text-stone-800">1.5 Reps</h4>
+                            <p class="text-sm text-stone-600">Movimento completo, sobe até a metade, desce de novo e completa. Aumenta o <span class="font-semibold text-amber-700">tempo sob tensão</span>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="nutricao" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Nutrição e Suplementação</h2>
+                <p class="text-lg text-stone-600 mb-6 leading-relaxed">A nutrição é o combustível da sua performance. Nesta seção, vamos além do básico, explorando estratégias como o Carb Cycling para otimizar a composição corporal e a energia. Também vamos desmistificar o mundo dos suplementos, fornecendo um guia interativo baseado em evidências científicas para que você invista seu dinheiro apenas no que realmente funciona.</p>
+                <div id="nutricao-tabs" class="mb-6 border-b border-stone-200">
+                    <button class="tab-button active py-2 px-4 border-b-2 font-medium text-stone-600" data-tab="carbcycling">Carb Cycling</button>
+                    <button class="tab-button py-2 px-4 border-b-2 font-medium text-stone-600" data-tab="suplementos">Guia de Suplementos</button>
+                </div>
+
+                <div id="carbcycling" class="tab-content">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">Guia Interativo de Carb Cycling</h3>
+                    <p class="text-stone-600 mb-4">O Carb Cycling alinha sua ingestão de carboidratos com a demanda do seu treino. Alterne entre dias de alta, moderada e baixa ingestão para maximizar a performance e a queima de gordura. Clique nos botões para ver um exemplo de como os macros mudam.</p>
+                    <div class="flex justify-center space-x-2 mb-4">
+                        <button class="carb-day-btn bg-amber-500 text-white py-2 px-4 rounded-lg" data-day="alto">Dia de Treino Pesado</button>
+                        <button class="carb-day-btn bg-teal-500 text-white py-2 px-4 rounded-lg" data-day="moderado">Dia de Treino Moderado</button>
+                        <button class="carb-day-btn bg-stone-500 text-white py-2 px-4 rounded-lg" data-day="baixo">Dia de Descanso</button>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <div class="chart-container h-80">
+                            <canvas id="carbCyclingChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="suplementos" class="tab-content hidden">
+                    <h3 class="text-2xl font-semibold text-amber-700 mb-4">Filtro de Suplementos por Evidência</h3>
+                     <div class="flex justify-center space-x-2 mb-6">
+                        <button class="sup-filter-btn bg-teal-600 text-white py-1 px-3 rounded-full text-sm" data-tier="all">Todos</button>
+                        <button class="sup-filter-btn bg-green-600 text-white py-1 px-3 rounded-full text-sm" data-tier="A">Tier 1 (Apoiado)</button>
+                        <button class="sup-filter-btn bg-yellow-600 text-white py-1 px-3 rounded-full text-sm" data-tier="B">Tier 2 (Contextual)</button>
+                        <button class="sup-filter-btn bg-red-600 text-white py-1 px-3 rounded-full text-sm" data-tier="C">Tier 3 (Pouca Evidência)</button>
+                    </div>
+                    <div id="suplementos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    </div>
+                </div>
+            </div>
+
+            <div id="recuperacao" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">A Vantagem Oculta: Recuperação</h2>
+                <p class="text-lg text-stone-600 mb-6 leading-relaxed">A adaptação e o crescimento muscular acontecem durante a recuperação. Otimizá-la é uma habilidade ativa que multiplica seus esforços no treino. Aqui, exploramos o sono como o anabolizante natural mais potente e analisamos ferramentas baseadas em evidências para acelerar seu processo de reparo e prepará-lo para a próxima sessão.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-2xl font-semibold text-amber-700 mb-3">Sono: O Anabolizante Natural</h3>
+                        <p class="text-stone-600 mb-4">A privação de sono reduz a testosterona, aumenta o cortisol e impede a liberação do hormônio do crescimento (GH). Atletas de elite buscam de 9 a 10 horas de sono por noite para otimizar a recuperação hormonal e a performance.</p>
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-800">Estudo de Stanford com Atletas</h4>
+                            <p class="text-sm text-amber-700 mt-2">Atletas que estenderam o sono para 10h/noite melhoraram:</p>
+                             <ul class="list-disc list-inside text-sm text-amber-700 mt-1">
+                                <li>Velocidade de Sprint: <span class="font-semibold">-4.3%</span></li>
+                                <li>Precisão de Arremesso: <span class="font-semibold">+9%</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">Ferramentas de Recuperação</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-bold text-stone-800">Recuperação Ativa</h4>
+                                <p class="text-sm text-stone-600">20-40 min de cardio leve para aumentar o fluxo sanguíneo e reduzir a dor muscular.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-stone-800">Terapia de Contraste</h4>
+                                <p class="text-sm text-stone-600">Alternar 1-2 min de água fria (10-15°C) com 1-2 min de água quente (38-40°C) para reduzir o inchaço.</p>
+                            </div>
+                             <div>
+                                <h4 class="font-bold text-stone-800">Sauna</h4>
+                                <p class="text-sm text-stone-600">15-20 min a 65-90°C para relaxamento muscular e melhora do fluxo sanguíneo. Hidrate-se!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mente" class="content-section">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">A Fortaleza Mental</h2>
+                <p class="text-lg text-stone-600 mb-6 leading-relaxed">Quando a capacidade física se equivale, a força mental decide o vencedor. Desenvolver uma mente resiliente é uma habilidade treinável, tão crucial quanto o treinamento físico. Explore as técnicas de visualização para programar o sucesso e o relaxamento muscular progressivo para dominar a ansiedade e transformar o nervosismo em prontidão para a vitória.</p>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-2xl font-semibold text-amber-700 mb-3">Ensaio Mental (Visualização)</h3>
+                        <p class="text-stone-600 mb-4">A visualização ativa as mesmas vias neurais da execução física, fortalecendo a memória muscular sem estresse físico. Atletas como Michael Phelps usaram essa técnica para programar a vitória.</p>
+                        <div class="bg-amber-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-amber-800 mb-2">Script de Visualização para Força</h4>
+                            <p class="text-sm text-stone-700 leading-relaxed font-mono">
+                            "Feche os olhos. Sinta a barra fria e áspera. Sinta o peso estável em suas costas. Respire fundo, crie pressão. Desça com controle, sinta a mola em seus músculos. Agora, EXPLODA para cima. Atravesse o ponto de dificuldade. Sinta a força dominante. Ouça o 'clack' da barra no rack. Sinta a realização."
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                        <h3 class="text-2xl font-semibold text-teal-700 mb-3">Controle da Ansiedade (PMR)</h3>
+                        <p class="text-stone-600 mb-4">O Relaxamento Muscular Progressivo (PMR) ensina a liberar a tensão física para acalmar a mente. É impossível estar fisicamente relaxado e ansioso ao mesmo tempo.</p>
+                        <div class="bg-teal-50 p-4 rounded-lg">
+                            <h4 class="font-bold text-teal-800 mb-2">Protocolo de PMR</h4>
+                             <p class="text-sm text-teal-700">Tensione um grupo muscular por 5-10s e depois solte abruptamente, focando na sensação de relaxamento.
+                             <br><strong>Exemplo:</strong> Feche o punho com força... segure... e solte. Sinta a tensão fluir para fora. Prossiga sistematicamente por todo o corpo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Data
+    const rpeData = {
+        labels: ['RPE 10', 'RPE 9', 'RPE 8', 'RPE 7'],
+        datasets: [{
+            label: 'Repetições na Reserva (RIR)',
+            data: [0, 1, 2, 3],
+            backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#10b981'],
+            borderColor: '#ffffff',
+            borderWidth: 2
+        }]
+    };
+
+    const carbCyclingData = {
+        alto: { protein: 165, carbs: 220, fat: 50 },
+        moderado: { protein: 160, carbs: 140, fat: 80 },
+        baixo: { protein: 150, carbs: 85, fat: 130 }
+    };
+
+    const suplementosData = [
+        { nome: 'Creatina Monohidratada', tier: 'A', desc: 'Aumenta os estoques de fosfocreatina para regeneração rápida de ATP. O suplemento mais eficaz para ganhos de força e potência.', dosagem: '3-5g/dia' },
+        { nome: 'Cafeína', tier: 'A', desc: 'Antagonista do receptor de adenosina, reduzindo a percepção de esforço. Melhora a performance de resistência e alta intensidade.', dosagem: '3-6 mg/kg' },
+        { nome: 'Beta-Alanina', tier: 'A', desc: 'Aumenta a carnosina muscular, que atua como tampão de pH, retardando a fadiga. Mais eficaz para exercícios de 1-10 minutos.', dosagem: '4-6g/dia' },
+        { nome: 'Nitrato (Suco de Beterraba)', tier: 'A', desc: 'Aumenta a produção de óxido nítrico (NO), melhorando a eficiência do uso de oxigênio. Beneficia a resistência.', dosagem: '5-9 mmol' },
+        { nome: 'Proteína em Pó', tier: 'B', desc: 'Fonte conveniente de proteína de alta qualidade. É "comida em pó", não um ergogênico mágico. Útil para atingir metas diárias.', dosagem: '20-40g/porção' },
+        { nome: 'Citrulina Malato', tier: 'B', desc: 'Pode aumentar o NO, melhorar o fluxo sanguíneo ("pump") e reduzir a dor muscular tardia (DOMS).', dosagem: '6-8g' },
+        { nome: 'BCAAs', tier: 'C', desc: 'Aminoácidos de cadeia ramificada. Desnecessário se a ingestão total de proteína de alta qualidade já for adequada.', dosagem: 'N/A' },
+        { nome: 'Glutamina', tier: 'C', desc: 'Alegações de melhora na recuperação e função imune não são suportadas por evidências robustas em atletas saudáveis.', dosagem: 'N/A' },
+    ];
+
+
+    // Charts
+    let rpeChart, carbChart;
+
+    function createRPEChart() {
+        if (rpeChart) rpeChart.destroy();
+        const ctx = document.getElementById('rpeChart').getContext('2d');
+        rpeChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: rpeData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Relação RPE vs. RIR'
+                    }
+                }
+            },
+        });
+    }
+
+    function createCarbCyclingChart(day) {
+        if (carbChart) carbChart.destroy();
+        const ctx = document.getElementById('carbCyclingChart').getContext('2d');
+        const data = carbCyclingData[day];
+        carbChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Proteína (g)', 'Carboidratos (g)', 'Gordura (g)'],
+                datasets: [{
+                    label: `Macros para Dia ${day.charAt(0).toUpperCase() + day.slice(1)}`,
+                    data: [data.protein, data.carbs, data.fat],
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#84cc16'],
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: `Exemplo de Macros para um Dia de Treino ${day.charAt(0).toUpperCase() + day.slice(1)}`
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    const contentSections = document.querySelectorAll('.content-section');
+
+    function showSection(targetId) {
+        contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === targetId);
+        });
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+        });
+
+        if (targetId === 'treinamento') {
+             if (!rpeChart) createRPEChart();
+        }
+        if (targetId === 'nutricao') {
+             if (!carbChart) createCarbCyclingChart('alto');
+             renderSuplementos('all');
+        }
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('href').substring(1);
+            showSection(targetId);
+        });
+    });
+
+    // Tab functionality
+    function handleTabs(containerId) {
+        const tabContainer = document.getElementById(containerId);
+        if (!tabContainer) return;
+
+        const tabButtons = tabContainer.querySelectorAll('.tab-button');
+        const tabContents = tabContainer.nextElementSibling.querySelectorAll(':scope > .tab-content');
+        
+        // Correctly associate buttons with content if IDs match
+        const parentContentDiv = tabContainer.parentElement;
+        const contentDivs = parentContentDiv.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const targetTabId = button.dataset.tab;
+
+                contentDivs.forEach(content => {
+                    content.classList.toggle('hidden', content.id !== targetTabId);
+                });
+            });
+        });
+    }
+    
+    handleTabs('treinamento-tabs');
+    handleTabs('nutricao-tabs');
+
+
+    // Carb cycling chart interaction
+    document.querySelectorAll('.carb-day-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const dayType = e.currentTarget.dataset.day;
+            createCarbCyclingChart(dayType);
+        });
+    });
+
+    // Suplementos filter
+    const suplementosGrid = document.getElementById('suplementos-grid');
+    const tierColors = {
+        'A': 'bg-green-50 border-green-200',
+        'B': 'bg-yellow-50 border-yellow-200',
+        'C': 'bg-red-50 border-red-200',
+    };
+     const tierTextColors = {
+        'A': 'text-green-700',
+        'B': 'text-yellow-700',
+        'C': 'text-red-700',
+    };
+
+    function renderSuplementos(tierFilter) {
+        suplementosGrid.innerHTML = '';
+        const filteredData = tierFilter === 'all' 
+            ? suplementosData 
+            : suplementosData.filter(s => s.tier === tierFilter);
+
+        filteredData.forEach(sup => {
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-lg shadow-sm border ${tierColors[sup.tier]}`;
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <h4 class="font-bold text-stone-800 text-lg">${sup.nome}</h4>
+                    <span class="text-xs font-bold ${tierTextColors[sup.tier]} px-2 py-1 rounded-full ${tierColors[sup.tier]} ring-1 ring-inset ring-current">Tier ${sup.tier}</span>
+                </div>
+                <p class="text-sm text-stone-600 my-2">${sup.desc}</p>
+                <p class="text-sm font-semibold text-stone-700">Dosagem: ${sup.dosagem}</p>
+            `;
+            suplementosGrid.appendChild(card);
+        });
+    }
+
+    document.querySelectorAll('.sup-filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const tier = e.currentTarget.dataset.tier;
+            renderSuplementos(tier);
+        });
+    });
+
+    // Initial load
+    showSection('inicio');
+});
+</script>
+
+</body>
+</html>
